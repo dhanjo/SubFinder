@@ -5,7 +5,6 @@ while getopts "d:s" opt; do
     case $opt in
         d) domain="$OPTARG";;
         s) silent="True";;
-        \?) usage;;
     esac
 done
 
@@ -64,15 +63,17 @@ main() {
     crt
     Findomain
     Subfinder
-    # Amass
     Assetfinder
 
     # Combine temporary files into a single file
-    cat tmp-wayback-$domain tmp-crt-$domain tmp-findomain-$domain tmp-subfinder-$domain tmp-assetfinder-$domain | uniq > subenum-$domain-$current_date.txt
+    sort tmp-wayback-$domain tmp-crt-$domain tmp-findomain-$domain tmp-subfinder-$domain tmp-assetfinder-$domain | uniq -i > subenum-$domain-$current_date.txt
     echo "Combined output saved to subenum-$domain.txt"
-
     # Clean up temporary files
     rm tmp-wayback-$domain tmp-crt-$domain tmp-findomain-$domain tmp-subfinder-$domain tmp-assetfinder-$domain
+
+	# Running HTTPROBE to get active websites.
+	sort subenum-$domain-$current_date.txt | httprobe > httprobe-$domain-$current_date.txt
+	echo "[*] HTTPROBE scanned file is httprobe-$domain-$current_date.txt"
 }
 
 # Call the main function
